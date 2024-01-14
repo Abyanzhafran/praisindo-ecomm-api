@@ -167,25 +167,42 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 
 	product, err := c.ProductRepo.GetById(ctx.Context(), id)
 	if err != nil {
-		return ctx.Status(http.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Id not found",
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	if err := ctx.BodyParser(&product); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Check your input data",
-			"error":   err.Error(),
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	if err := c.ProductRepo.Update(ctx.Context(), product); err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": err.Error(),
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	singleProductResponse := response.ProductSingleResponse{
@@ -203,21 +220,31 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
-	var product domain.Product
-
-	err := c.ProductRepo.Delete(ctx.Context(), id)
+	_, err := c.ProductRepo.GetById(ctx.Context(), id)
 	if err != nil {
-		return ctx.Status(http.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Id not found",
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	if err := c.ProductRepo.Delete(ctx.Context(), id); err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": err.Error(),
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	singleProductResponse := response.ProductSingleResponse{
@@ -226,7 +253,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 		Error:         "",
 		Tin:           time.Now(),
 		Tout:          time.Now(),
-		Data:          product,
+		Data:          nil,
 	}
 
 	return ctx.Status(http.StatusOK).JSON(singleProductResponse)

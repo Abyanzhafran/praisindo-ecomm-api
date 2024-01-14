@@ -31,7 +31,7 @@ type ProductSingleResponse struct {
 	Error         string    `json:"error"`
 	Tin           time.Time `json:"tin"`
 	Tout          time.Time `json:"tout"`
-	Data          domain.Product
+	Data          interface{}
 }
 
 type ProductErrorResponse struct {
