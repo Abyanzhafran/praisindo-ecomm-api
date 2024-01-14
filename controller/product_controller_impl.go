@@ -106,30 +106,48 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 	var product domain.Product
 
+	// Request data should in accordance with product model(domain)
 	if err := ctx.BodyParser(&product); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Check your input data",
-			"error":   err.Error(),
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
-	// generate uuid for the book
+	// Generate uuid for the product
 	generatedUuid, err := uuid.NewRandom()
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Error generating uuid",
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	product.IDProduct = generatedUuid.String()
 
 	if err := c.ProductRepo.Add(ctx.Context(), &product); err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": err.Error(),
-		})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	singleProductResponse := response.ProductSingleResponse{
