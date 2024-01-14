@@ -163,3 +163,37 @@ func (c *ProductControllerImpl) Update(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, singleProductResponse)
 }
+
+func (c *ProductControllerImpl) Delete(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var product domain.Product
+
+	err := c.ProductRepo.Delete(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"status":  "error",
+			"message": "Id not found",
+		})
+		return
+	}
+
+	if err := c.ProductRepo.Delete(ctx, id); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	singleProductResponse := response.ProductSingleResponse{
+		CorrelationID: uuid.NewString(),
+		Success:       true,
+		Error:         "",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          product,
+	}
+
+	ctx.JSON(http.StatusOK, singleProductResponse)
+}

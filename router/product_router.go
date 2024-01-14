@@ -23,4 +23,5 @@ func ProductRouter(router *gin.Engine) {
 	productRouter.GET("/:id", productCtrl.FindById)
 	productRouter.POST("/", productCtrl.Create)
 	productRouter.PUT("/:id", productCtrl.Update)
+	productRouter.DELETE("/:id", productCtrl.Delete)
 }

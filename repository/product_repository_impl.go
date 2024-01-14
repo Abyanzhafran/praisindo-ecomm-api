@@ -42,3 +42,7 @@ func (r *ProductRepositoryImpl) Add(ctx context.Context, product *domain.Product
 func (r *ProductRepositoryImpl) Update(ctx context.Context, product *domain.Product) error {
 	return r.DB.Model(&domain.Product{}).Where("id_product = ?", product.IDProduct).Updates(product).Error
 }
+
+func (r *ProductRepositoryImpl) Delete(ctx context.Context, id string) error {
+	return r.DB.Where("id_product = ?", id).Delete(&domain.Product{}).Error
+}
