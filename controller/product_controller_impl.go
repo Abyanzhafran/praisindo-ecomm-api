@@ -34,7 +34,7 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -85,7 +85,7 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -114,7 +114,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -129,7 +129,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -144,7 +144,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -173,7 +173,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -186,7 +186,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -199,7 +199,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -228,7 +228,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -241,7 +241,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 			Error:         err.Error(),
 			Tin:           time.Now(),
 			Tout:          time.Now(),
-			Data:          nil,
+			Data:          map[string]interface{}{},
 		}
 
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
@@ -253,7 +253,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 		Error:         "",
 		Tin:           time.Now(),
 		Tout:          time.Now(),
-		Data:          nil,
+		Data:          map[string]interface{}{},
 	}
 
 	return ctx.Status(http.StatusOK).JSON(singleProductResponse)
