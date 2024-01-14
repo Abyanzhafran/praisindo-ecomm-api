@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ProductControllerImpl struct {
@@ -74,6 +75,49 @@ func (c *ProductControllerImpl) FindById(ctx *gin.Context) {
 		Tin:           time.Now(),
 		Tout:          time.Now(),
 		Data:          *products,
+	}
+
+	ctx.JSON(http.StatusOK, singleProductResponse)
+}
+
+func (c *ProductControllerImpl) Create(ctx *gin.Context) {
+	var product domain.Product
+
+	if err := ctx.ShouldBindJSON(&product); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  "error",
+			"message": "Check your input data",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// generate uuid for the book
+	generatedUuid, err := uuid.NewRandom()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": "Error generating uuid",
+		})
+	}
+
+	product.IDProduct = generatedUuid.String()
+
+	if err := c.ProductRepo.Add(ctx, &product); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	singleProductResponse := response.ProductSingleResponse{
+		CorrelationID: uuid.NewString(),
+		Success:       true,
+		Error:         "",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          product,
 	}
 
 	ctx.JSON(http.StatusOK, singleProductResponse)

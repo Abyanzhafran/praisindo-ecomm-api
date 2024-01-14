@@ -34,3 +34,7 @@ func (r *ProductRepositoryImpl) GetById(ctx context.Context, id string) (*domain
 
 	return product, nil
 }
+
+func (r *ProductRepositoryImpl) Add(ctx context.Context, product *domain.Product) error {
+	return r.DB.Create(product).Error
+}
