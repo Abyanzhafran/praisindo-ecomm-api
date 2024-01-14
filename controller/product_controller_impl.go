@@ -77,14 +77,24 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
 	products, err := c.ProductRepo.GetById(ctx.Context(), id)
+
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: "some-correlation-id",
+		CorrelationID: uuid.NewString(),
 		Success:       true,
-		Error:         "some error message",
+		Error:         "",
 		Tin:           time.Now(),
 		Tout:          time.Now(),
 		Data:          *products,
