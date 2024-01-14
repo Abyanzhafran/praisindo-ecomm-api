@@ -40,4 +40,5 @@ type ProductErrorResponse struct {
 	Error         string    `json:"error"`
 	Tin           time.Time `json:"tin"`
 	Tout          time.Time `json:"tout"`
+	Data          interface{}
 }

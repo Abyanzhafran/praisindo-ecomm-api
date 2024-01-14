@@ -20,14 +20,22 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 }
 
 func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
+
+	// Mapping required error data
+	productResponseError := response.ProductErrorResponse{
+		CorrelationID: uuid.NewString(),
+		Success:       false,
+		Error:         "",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          nil,
+	}
 	// Retrieve products from the repository
 	products, err := c.ProductRepo.GetAll(ctx.Context())
+
+	// Error handling
 	if err != nil {
-		// Handle the error and return an Internal Server Error response
-		return ctx.Status(http.StatusInternalServerError).JSON(response.ProductListResponse{
-			Success: false,
-			Error:   "Internal Server Error",
-		})
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
 	// Dereference each element in the slice
@@ -37,7 +45,7 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 	}
 
 	productListResponse := response.ProductListResponse{
-		CorrelationID: "some-correlation-id", // You may want to generate a correlation ID dynamically
+		CorrelationID: uuid.NewString(),
 		Success:       true,
 		Error:         "",
 		Tin:           time.Now(),
@@ -45,12 +53,12 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 		Data: response.ProductList{
 			List:       dereferencedProducts,
 			TotalItems: len(dereferencedProducts),
-			TotalPages: 1,                         // You may need to calculate the total pages based on your pagination logic
-			Page:       1,                         // You may need to get the current page from the request
-			PageSize:   len(dereferencedProducts), // Assuming no pagination, adjust accordingly
+			TotalPages: 1,
+			Page:       1,
+			PageSize:   len(dereferencedProducts),
 			Start:      time.Now(),
 			Finish:     time.Now(),
-			Duration:   "some-duration", // You may want to calculate the duration
+			Duration:   "some-duration", // Add some duration
 		},
 	}
 
