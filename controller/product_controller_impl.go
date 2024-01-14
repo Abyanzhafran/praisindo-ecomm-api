@@ -20,21 +20,21 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 }
 
 func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
-
-	// Mapping required error data
-	productResponseError := response.ProductErrorResponse{
-		CorrelationID: uuid.NewString(),
-		Success:       false,
-		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          nil,
-	}
 	// Retrieve products from the repository
 	products, err := c.ProductRepo.GetAll(ctx.Context())
 
 	// Error handling
 	if err != nil {
+		// Mapping required error data
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          nil,
+		}
+
 		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
 	}
 
