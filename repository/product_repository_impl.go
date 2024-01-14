@@ -38,3 +38,7 @@ func (r *ProductRepositoryImpl) GetById(ctx context.Context, id string) (*domain
 func (r *ProductRepositoryImpl) Add(ctx context.Context, product *domain.Product) error {
 	return r.DB.Create(product).Error
 }
+
+func (r *ProductRepositoryImpl) Update(ctx context.Context, product *domain.Product) error {
+	return r.DB.Model(&domain.Product{}).Where("id_product = ?", product.IDProduct).Updates(product).Error
+}

@@ -122,3 +122,44 @@ func (c *ProductControllerImpl) Create(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, singleProductResponse)
 }
+
+func (c *ProductControllerImpl) Update(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	product, err := c.ProductRepo.GetById(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"status":  "error",
+			"message": "Id not found",
+		})
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&product); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  "error",
+			"message": "Check your input data",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := c.ProductRepo.Update(ctx, product); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	singleProductResponse := response.ProductSingleResponse{
+		CorrelationID: uuid.NewString(),
+		Success:       true,
+		Error:         "",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          *product,
+	}
+
+	ctx.JSON(http.StatusOK, singleProductResponse)
+}
