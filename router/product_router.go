@@ -15,13 +15,15 @@ func ProductRouter(app *fiber.App) {
 
 	productCtrl := controller.NewProductController(productRepo)
 
-	// Main product router group
 	productRouter := app.Group("/product")
 
-	// Normal product, without auth
 	productRouter.Get("", productCtrl.FindAll)
 	productRouter.Get("/:id", productCtrl.FindById)
 	productRouter.Post("/", productCtrl.Create)
 	productRouter.Put("/:id", productCtrl.Update)
 	productRouter.Delete("/:id", productCtrl.Delete)
+
+	// Example usage for paging
+	// http://localhost:8080/product?page=2&pageSize=4
+	// use it in here productRouter.Get("", productCtrl.FindAll)
 }

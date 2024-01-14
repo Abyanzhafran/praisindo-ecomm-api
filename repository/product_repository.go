@@ -11,4 +11,5 @@ type ProductRepository interface {
 	Add(ctx context.Context, product *domain.Product) error
 	Update(ctx context.Context, product *domain.Product) error
 	Delete(ctx context.Context, id string) error
+	GetPaginated(ctx context.Context, pageSize int64, offset int) ([]*domain.Product, int, error)
 }

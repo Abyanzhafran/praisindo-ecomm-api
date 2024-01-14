@@ -46,3 +46,20 @@ func (r *ProductRepositoryImpl) Update(ctx context.Context, product *domain.Prod
 func (r *ProductRepositoryImpl) Delete(ctx context.Context, id string) error {
 	return r.DB.Where("id_product = ?", id).Delete(&domain.Product{}).Error
 }
+
+func (r *ProductRepositoryImpl) GetPaginated(ctx context.Context, pageSize int64, offset int) ([]*domain.Product, int, error) {
+	var products []*domain.Product
+	var totalCount int64
+
+	// Count total products
+	if err := r.DB.Model(&domain.Product{}).Count(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated products
+	if err := r.DB.Limit(int(pageSize)).Offset(int(offset)).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, int(totalCount), nil
+}

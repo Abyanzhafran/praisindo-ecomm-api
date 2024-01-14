@@ -4,7 +4,9 @@ import (
 	"dev/models/domain"
 	"dev/models/http/response"
 	"dev/repository"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,10 +24,22 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 	start := time.Now()
 
-	// Retrieve products from the repository
-	products, err := c.ProductRepo.GetAll(ctx.Context())
+	// Parse pagination parameters
+	page, err := strconv.Atoi(ctx.Query("page", "1"))
+	if err != nil || page < 1 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid page parameter"})
+	}
 
-	// Error handling
+	pageSize, err := strconv.Atoi(ctx.Query("pageSize", "5"))
+	if err != nil || pageSize < 1 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid pageSize parameter"})
+	}
+
+	// Calculate offset based on page and pageSize
+	offset := (page - 1) * pageSize
+
+	products, totalCount, err := c.ProductRepo.GetPaginated(ctx.Context(), int64(pageSize), offset)
+
 	if err != nil {
 		// Mapping required error data
 		productResponseError := response.ProductErrorResponse{
@@ -48,8 +62,10 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 
 	finish := time.Now()
 
+	// Calculate total pages for paging
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+
 	// Benchmark the query duration
-	// idk if it's true or not for the bencmark
 	duration := finish.Sub(start).String()
 
 	productListResponse := response.ProductListResponse{
@@ -60,10 +76,10 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 		Tout:          finish,
 		Data: response.ProductList{
 			List:       dereferencedProducts,
-			TotalItems: len(dereferencedProducts),
-			TotalPages: 1,
-			Page:       1,
-			PageSize:   len(dereferencedProducts),
+			TotalItems: totalCount,
+			TotalPages: totalPages,
+			Page:       page,
+			PageSize:   pageSize,
 			Start:      start,
 			Finish:     finish,
 			Duration:   duration,
