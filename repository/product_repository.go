@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"dev/models"
+	"dev/models/domain"
 )
 
 type ProductRepository interface {
-	GetAll(ctx context.Context) ([]*models.Product, error)
-	GetById(ctx context.Context, id string) (*models.Product, error)
+	GetAll(ctx context.Context) ([]*domain.Product, error)
+	GetById(ctx context.Context, id string) (*domain.Product, error)
 }

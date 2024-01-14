@@ -1,7 +1,7 @@
 package app
 
 import (
-	"dev/models"
+	"dev/models/domain"
 	"fmt"
 	"log"
 	"os"
@@ -31,12 +31,7 @@ func NewDB() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	// use "models" instead of "domain"
-	// if err := db.AutoMigrate(&domain.User{}, &domain.Photo{}, &domain.Comment{}, &domain.SocialMedia{}); err != nil {
-	// 	log.Fatal(err.Error())
-	// }
-
-	if err := db.AutoMigrate(&models.Product{}); err != nil {
+	if err := db.AutoMigrate(&domain.Product{}); err != nil {
 		log.Fatal(err.Error())
 	}
 

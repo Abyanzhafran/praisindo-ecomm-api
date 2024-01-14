@@ -1,4 +1,4 @@
-package models
+package domain
 
 type Product struct {
 	IDProduct   string `json:"id_product"`
