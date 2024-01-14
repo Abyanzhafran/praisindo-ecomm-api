@@ -20,8 +20,8 @@ func ProductRouter(app *fiber.App) {
 
 	// Normal product, without auth
 	productRouter.Get("", productCtrl.FindAll)
-	// productRouter.Get("/:id", productCtrl.FindById)
-	// productRouter.Post("/", productCtrl.Create)
+	productRouter.Get("/:id", productCtrl.FindById)
+	productRouter.Post("/", productCtrl.Create)
 	// productRouter.Put("/:id", productCtrl.Update)
 	// productRouter.Delete("/:id", productCtrl.Delete)
 }
