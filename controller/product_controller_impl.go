@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ProductControllerImpl struct {
@@ -19,16 +18,15 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 	return &ProductControllerImpl{ProductRepo: ProductRepo}
 }
 
-func (c *ProductControllerImpl) FindAll(ctx *gin.Context) {
+func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 	// Retrieve products from the repository
-	products, err := c.ProductRepo.GetAll(ctx)
+	products, err := c.ProductRepo.GetAll(ctx.Context())
 	if err != nil {
 		// Handle the error and return an Internal Server Error response
-		ctx.JSON(http.StatusInternalServerError, response.ProductListResponse{
+		return ctx.Status(http.StatusInternalServerError).JSON(response.ProductListResponse{
 			Success: false,
 			Error:   "Internal Server Error",
 		})
-		return
 	}
 
 	// Dereference each element in the slice
@@ -55,145 +53,144 @@ func (c *ProductControllerImpl) FindAll(ctx *gin.Context) {
 		},
 	}
 
-	// Return the ProductListResponse as JSON
-	ctx.JSON(http.StatusOK, productListResponse)
+	return ctx.JSON(productListResponse)
 }
 
-func (c *ProductControllerImpl) FindById(ctx *gin.Context) {
-	id := ctx.Param("id")
+// func (c *ProductControllerImpl) FindById(ctx *gin.Context) {
+// 	id := ctx.Param("id")
 
-	products, err := c.ProductRepo.GetById(ctx, id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
+// 	products, err := c.ProductRepo.GetById(ctx, id)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+// 		return
+// 	}
 
-	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: "some-correlation-id",
-		Success:       true,
-		Error:         "some error message",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          *products,
-	}
+// 	singleProductResponse := response.ProductSingleResponse{
+// 		CorrelationID: "some-correlation-id",
+// 		Success:       true,
+// 		Error:         "some error message",
+// 		Tin:           time.Now(),
+// 		Tout:          time.Now(),
+// 		Data:          *products,
+// 	}
 
-	ctx.JSON(http.StatusOK, singleProductResponse)
-}
+// 	ctx.JSON(http.StatusOK, singleProductResponse)
+// }
 
-func (c *ProductControllerImpl) Create(ctx *gin.Context) {
-	var product domain.Product
+// func (c *ProductControllerImpl) Create(ctx *gin.Context) {
+// 	var product domain.Product
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Check your input data",
-			"error":   err.Error(),
-		})
-		return
-	}
+// 	if err := ctx.ShouldBindJSON(&product); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{
+// 			"status":  "error",
+// 			"message": "Check your input data",
+// 			"error":   err.Error(),
+// 		})
+// 		return
+// 	}
 
-	// generate uuid for the book
-	generatedUuid, err := uuid.NewRandom()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Error generating uuid",
-		})
-	}
+// 	// generate uuid for the book
+// 	generatedUuid, err := uuid.NewRandom()
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"status":  "error",
+// 			"message": "Error generating uuid",
+// 		})
+// 	}
 
-	product.IDProduct = generatedUuid.String()
+// 	product.IDProduct = generatedUuid.String()
 
-	if err := c.ProductRepo.Add(ctx, &product); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": err.Error(),
-		})
-		return
-	}
+// 	if err := c.ProductRepo.Add(ctx, &product); err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"status":  "error",
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: uuid.NewString(),
-		Success:       true,
-		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          product,
-	}
+// 	singleProductResponse := response.ProductSingleResponse{
+// 		CorrelationID: uuid.NewString(),
+// 		Success:       true,
+// 		Error:         "",
+// 		Tin:           time.Now(),
+// 		Tout:          time.Now(),
+// 		Data:          product,
+// 	}
 
-	ctx.JSON(http.StatusOK, singleProductResponse)
-}
+// 	ctx.JSON(http.StatusOK, singleProductResponse)
+// }
 
-func (c *ProductControllerImpl) Update(ctx *gin.Context) {
-	id := ctx.Param("id")
+// func (c *ProductControllerImpl) Update(ctx *gin.Context) {
+// 	id := ctx.Param("id")
 
-	product, err := c.ProductRepo.GetById(ctx, id)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "Id not found",
-		})
-		return
-	}
+// 	product, err := c.ProductRepo.GetById(ctx, id)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusNotFound, gin.H{
+// 			"status":  "error",
+// 			"message": "Id not found",
+// 		})
+// 		return
+// 	}
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Check your input data",
-			"error":   err.Error(),
-		})
-		return
-	}
+// 	if err := ctx.ShouldBindJSON(&product); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{
+// 			"status":  "error",
+// 			"message": "Check your input data",
+// 			"error":   err.Error(),
+// 		})
+// 		return
+// 	}
 
-	if err := c.ProductRepo.Update(ctx, product); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": err.Error(),
-		})
-		return
-	}
+// 	if err := c.ProductRepo.Update(ctx, product); err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"status":  "error",
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: uuid.NewString(),
-		Success:       true,
-		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          *product,
-	}
+// 	singleProductResponse := response.ProductSingleResponse{
+// 		CorrelationID: uuid.NewString(),
+// 		Success:       true,
+// 		Error:         "",
+// 		Tin:           time.Now(),
+// 		Tout:          time.Now(),
+// 		Data:          *product,
+// 	}
 
-	ctx.JSON(http.StatusOK, singleProductResponse)
-}
+// 	ctx.JSON(http.StatusOK, singleProductResponse)
+// }
 
-func (c *ProductControllerImpl) Delete(ctx *gin.Context) {
-	id := ctx.Param("id")
+// func (c *ProductControllerImpl) Delete(ctx *gin.Context) {
+// 	id := ctx.Param("id")
 
-	var product domain.Product
+// 	var product domain.Product
 
-	err := c.ProductRepo.Delete(ctx, id)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "Id not found",
-		})
-		return
-	}
+// 	err := c.ProductRepo.Delete(ctx, id)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusNotFound, gin.H{
+// 			"status":  "error",
+// 			"message": "Id not found",
+// 		})
+// 		return
+// 	}
 
-	if err := c.ProductRepo.Delete(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": err.Error(),
-		})
-		return
-	}
+// 	if err := c.ProductRepo.Delete(ctx, id); err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"status":  "error",
+// 			"message": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: uuid.NewString(),
-		Success:       true,
-		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          product,
-	}
+// 	singleProductResponse := response.ProductSingleResponse{
+// 		CorrelationID: uuid.NewString(),
+// 		Success:       true,
+// 		Error:         "",
+// 		Tin:           time.Now(),
+// 		Tout:          time.Now(),
+// 		Data:          product,
+// 	}
 
-	ctx.JSON(http.StatusOK, singleProductResponse)
-}
+// 	ctx.JSON(http.StatusOK, singleProductResponse)
+// }

@@ -1,27 +1,27 @@
 package router
 
 import (
-	"dev/app"
+	"dev/app/config"
 	"dev/controller"
 	"dev/repository"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func ProductRouter(router *gin.Engine) {
-	db := app.NewDB()
+func ProductRouter(app *fiber.App) {
+	db := config.NewDB()
 
 	productRepo := repository.NewProductRepository(db)
 
 	productCtrl := controller.NewProductController(productRepo)
 
 	// Main product router group
-	productRouter := router.Group("/product")
+	productRouter := app.Group("/product")
 
 	// Normal product, without auth
-	productRouter.GET("", productCtrl.FindAll)
-	productRouter.GET("/:id", productCtrl.FindById)
-	productRouter.POST("/", productCtrl.Create)
-	productRouter.PUT("/:id", productCtrl.Update)
-	productRouter.DELETE("/:id", productCtrl.Delete)
+	productRouter.Get("", productCtrl.FindAll)
+	// productRouter.Get("/:id", productCtrl.FindById)
+	// productRouter.Post("/", productCtrl.Create)
+	// productRouter.Put("/:id", productCtrl.Update)
+	// productRouter.Delete("/:id", productCtrl.Delete)
 }

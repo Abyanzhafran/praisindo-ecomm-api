@@ -4,36 +4,30 @@ import (
 	"dev/router"
 	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-// Cors custom function
-// use this, instead of use gin's cors function
-// there still a bug at there
-func CORS() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+// Third experiment
+func main() {
+	app := fiber.New()
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
+	// Apply CORS middleware
+	app.Use(func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", "*")
+		c.Set("Access-Control-Allow-Credentials", "true")
+		c.Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Method() == "OPTIONS" {
+			return c.Status(fiber.StatusNoContent).SendString("")
 		}
 
-		c.Next()
-	}
-}
+		return c.Next()
+	})
 
-func main() {
-	r := gin.Default()
+	router.ProductRouter(app)
 
-	r.Use(CORS())
-
-	router.ProductRouter(r)
-
-	if err := r.Run(); err != nil {
-		log.Fatalf("failed to start server: ")
+	if err := app.Listen(":8080"); err != nil {
+		log.Fatalf("failed to start server: %v", err)
 	}
 }
