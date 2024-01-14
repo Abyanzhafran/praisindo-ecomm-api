@@ -20,6 +20,8 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 }
 
 func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
+	start := time.Now()
+
 	// Retrieve products from the repository
 	products, err := c.ProductRepo.GetAll(ctx.Context())
 
@@ -44,21 +46,27 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 		dereferencedProducts = append(dereferencedProducts, *p)
 	}
 
+	finish := time.Now()
+
+	// Benchmark the query duration
+	// idk if it's true or not for the bencmark
+	duration := finish.Sub(start).String()
+
 	productListResponse := response.ProductListResponse{
 		CorrelationID: uuid.NewString(),
 		Success:       true,
 		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
+		Tin:           start,
+		Tout:          finish,
 		Data: response.ProductList{
 			List:       dereferencedProducts,
 			TotalItems: len(dereferencedProducts),
 			TotalPages: 1,
 			Page:       1,
 			PageSize:   len(dereferencedProducts),
-			Start:      time.Now(),
-			Finish:     time.Now(),
-			Duration:   "some-duration", // Add some duration
+			Start:      start,
+			Finish:     finish,
+			Duration:   duration,
 		},
 	}
 
