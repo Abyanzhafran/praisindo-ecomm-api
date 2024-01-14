@@ -16,9 +16,19 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 }
 
 func (c *ProductControllerImpl) FindAll(ctx *gin.Context) {
-	// id := ctx.Param("id")
-
 	products, err := c.ProductRepo.GetAll(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, products)
+}
+
+func (c *ProductControllerImpl) FindById(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	products, err := c.ProductRepo.GetById(ctx, id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return

@@ -20,4 +20,5 @@ func ProductRouter(router *gin.Engine) {
 
 	// Normal product, without auth
 	productRouter.GET("", productCtrl.FindAll)
+	productRouter.GET("/:id", productCtrl.FindById)
 }

@@ -24,3 +24,13 @@ func (r *ProductRepositoryImpl) GetAll(ctx context.Context) ([]*models.Product, 
 
 	return products, nil
 }
+
+func (r *ProductRepositoryImpl) GetById(ctx context.Context, id string) (*models.Product, error) {
+	var product *models.Product
+
+	if err := r.DB.Where("id_product = ?", id).First(&product).Error; err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}
