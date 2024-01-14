@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type ProductDetail struct {
+type ProductList struct {
 	List       []domain.Product `json:"list"`
 	TotalItems int              `json:"total_items"`
 	TotalPages int              `json:"total_pages"`
@@ -22,7 +22,16 @@ type ProductListResponse struct {
 	Error         string    `json:"error"`
 	Tin           time.Time `json:"tin"`
 	Tout          time.Time `json:"tout"`
-	Data          ProductDetail
+	Data          ProductList
+}
+
+type ProductSingleResponse struct {
+	CorrelationID string    `json:"correlationid"`
+	Success       bool      `json:"success"`
+	Error         string    `json:"error"`
+	Tin           time.Time `json:"tin"`
+	Tout          time.Time `json:"tout"`
+	Data          domain.Product
 }
 
 type ProductErrorResponse struct {

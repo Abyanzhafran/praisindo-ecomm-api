@@ -42,7 +42,7 @@ func (c *ProductControllerImpl) FindAll(ctx *gin.Context) {
 		Error:         "",
 		Tin:           time.Now(),
 		Tout:          time.Now(),
-		Data: response.ProductDetail{
+		Data: response.ProductList{
 			List:       dereferencedProducts,
 			TotalItems: len(dereferencedProducts),
 			TotalPages: 1,                         // You may need to calculate the total pages based on your pagination logic
@@ -67,5 +67,14 @@ func (c *ProductControllerImpl) FindById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, products)
+	singleProductResponse := response.ProductSingleResponse{
+		CorrelationID: "some-correlation-id",
+		Success:       true,
+		Error:         "some error message",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          *products,
+	}
+
+	ctx.JSON(http.StatusOK, singleProductResponse)
 }
