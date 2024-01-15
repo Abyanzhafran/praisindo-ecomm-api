@@ -42,7 +42,7 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		// Mapping required error data
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -63,6 +63,7 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 	finish := time.Now()
 
 	// Calculate total pages for paging
+	// math.ceil is always round up, similiar with JS
 	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
 
 	// Benchmark the query duration
@@ -95,7 +96,7 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 	products, err := c.ProductRepo.GetById(ctx.Context(), id)
 
 	if err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -125,7 +126,7 @@ func (c *ProductControllerImpl) FindByProductName(ctx *fiber.Ctx) error {
 	products, err := c.ProductRepo.GetByProductName(ctx.Context(), productName)
 
 	if err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -154,7 +155,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 
 	// Request data should in accordance with product model(domain)
 	if err := ctx.BodyParser(&product); err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -169,7 +170,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 	// Generate uuid for the product
 	generatedUuid, err := uuid.NewRandom()
 	if err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -184,7 +185,7 @@ func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 	product.IDProduct = generatedUuid.String()
 
 	if err := c.ProductRepo.Add(ctx.Context(), &product); err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -213,7 +214,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 
 	product, err := c.ProductRepo.GetById(ctx.Context(), id)
 	if err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -226,7 +227,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 	}
 
 	if err := ctx.BodyParser(&product); err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -239,7 +240,7 @@ func (c *ProductControllerImpl) Update(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.ProductRepo.Update(ctx.Context(), product); err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -268,7 +269,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 
 	_, err := c.ProductRepo.GetById(ctx.Context(), id)
 	if err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),
@@ -281,7 +282,7 @@ func (c *ProductControllerImpl) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.ProductRepo.Delete(ctx.Context(), id); err != nil {
-		productResponseError := response.ProductErrorResponse{
+		productResponseError := response.ProductSingleResponse{
 			CorrelationID: uuid.NewString(),
 			Success:       false,
 			Error:         err.Error(),

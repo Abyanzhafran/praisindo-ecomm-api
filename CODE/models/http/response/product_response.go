@@ -33,12 +33,3 @@ type ProductSingleResponse struct {
 	Tout          time.Time `json:"tout"`
 	Data          interface{}
 }
-
-type ProductErrorResponse struct {
-	CorrelationID string    `json:"correlationid"`
-	Success       bool      `json:"success"`
-	Error         string    `json:"error"`
-	Tin           time.Time `json:"tin"`
-	Tout          time.Time `json:"tout"`
-	Data          interface{}
-}
