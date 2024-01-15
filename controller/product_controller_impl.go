@@ -119,6 +119,36 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(singleProductResponse)
 }
 
+func (c *ProductControllerImpl) FindByProductName(ctx *fiber.Ctx) error {
+	productName := ctx.Params("productName")
+
+	products, err := c.ProductRepo.GetByProductName(ctx.Context(), productName)
+
+	if err != nil {
+		productResponseError := response.ProductErrorResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       false,
+			Error:         err.Error(),
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          map[string]interface{}{},
+		}
+
+		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
+	}
+
+	singleProductResponse := response.ProductSingleResponse{
+		CorrelationID: uuid.NewString(),
+		Success:       true,
+		Error:         "",
+		Tin:           time.Now(),
+		Tout:          time.Now(),
+		Data:          *products,
+	}
+
+	return ctx.Status(http.StatusOK).JSON(singleProductResponse)
+}
+
 func (c *ProductControllerImpl) Create(ctx *fiber.Ctx) error {
 	var product domain.Product
 

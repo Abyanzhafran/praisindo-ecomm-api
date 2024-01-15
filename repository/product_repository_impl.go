@@ -35,6 +35,16 @@ func (r *ProductRepositoryImpl) GetById(ctx context.Context, id string) (*domain
 	return product, nil
 }
 
+func (r *ProductRepositoryImpl) GetByProductName(ctx context.Context, productName string) (*domain.Product, error) {
+	var product *domain.Product
+
+	if err := r.DB.Where("product_name = ?", productName).First(&product).Error; err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}
+
 func (r *ProductRepositoryImpl) Add(ctx context.Context, product *domain.Product) error {
 	return r.DB.Create(product).Error
 }

@@ -19,6 +19,7 @@ func ProductRouter(app *fiber.App) {
 
 	productRouter.Get("", productCtrl.FindAll)
 	productRouter.Get("/:id", productCtrl.FindById)
+	productRouter.Get("/search_product/:productName", productCtrl.FindByProductName)
 	productRouter.Post("/", productCtrl.Create)
 	productRouter.Put("/:id", productCtrl.Update)
 	productRouter.Delete("/:id", productCtrl.Delete)
