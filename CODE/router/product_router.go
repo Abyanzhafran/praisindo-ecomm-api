@@ -15,11 +15,11 @@ func ProductRouter(app *fiber.App) {
 
 	productCtrl := controller.NewProductController(productRepo)
 
-	productRouter := app.Group("/product")
+	// Api conventional naming
+	productRouter := app.Group("api/v1/product")
 
 	productRouter.Get("", productCtrl.FindAll)
 	productRouter.Get("/:id", productCtrl.FindById)
-	productRouter.Get("/search_product/:productName", productCtrl.FindByProductName)
 	productRouter.Post("/", productCtrl.Create)
 	productRouter.Put("/:id", productCtrl.Update)
 	productRouter.Delete("/:id", productCtrl.Delete)

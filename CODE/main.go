@@ -25,6 +25,9 @@ func main() {
 		return c.Next()
 	})
 
+	// Serve static files from the "public" directory
+	app.Static("/public", "./public")
+
 	router.ProductRouter(app)
 
 	if err := app.Listen(":8080"); err != nil {

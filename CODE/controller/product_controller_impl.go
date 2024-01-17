@@ -22,23 +22,58 @@ func NewProductController(ProductRepo repository.ProductRepository) ProductContr
 }
 
 func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
+	// Get query param
+	page := ctx.Query("page", "1")
+	pageSize := ctx.Query("pageSize", "5")
+	productName := ctx.Query("product-name")
+
+	// If product query searched
+	if productName != "" {
+		products, err := c.ProductRepo.GetByProductName(ctx.Context(), productName)
+
+		if err != nil {
+			productResponseError := response.ProductSingleResponse{
+				CorrelationID: uuid.NewString(),
+				Success:       false,
+				Error:         err.Error(),
+				Tin:           time.Now(),
+				Tout:          time.Now(),
+				Data:          map[string]interface{}{},
+			}
+
+			return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
+		}
+
+		singleProductResponse := response.ProductSingleResponse{
+			CorrelationID: uuid.NewString(),
+			Success:       true,
+			Error:         "",
+			Tin:           time.Now(),
+			Tout:          time.Now(),
+			Data:          *products,
+		}
+
+		return ctx.Status(http.StatusOK).JSON(singleProductResponse)
+	}
+
 	start := time.Now()
 
-	// Parse pagination parameters
-	page, err := strconv.Atoi(ctx.Query("page", "1"))
-	if err != nil || page < 1 {
+	// Atoi, Convert string to int
+	parsedPage, err := strconv.Atoi(page)
+	if err != nil || parsedPage < 1 {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid page parameter"})
 	}
 
-	pageSize, err := strconv.Atoi(ctx.Query("pageSize", "5"))
-	if err != nil || pageSize < 1 {
+	parsedPageSize, err := strconv.Atoi(pageSize)
+	if err != nil || parsedPageSize < 1 {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid pageSize parameter"})
 	}
 
 	// Calculate offset based on page and pageSize
-	offset := (page - 1) * pageSize
+	// like max item in each page
+	offset := (parsedPage - 1) * parsedPageSize
 
-	products, totalCount, err := c.ProductRepo.GetPaginated(ctx.Context(), int64(pageSize), offset)
+	products, totalCount, err := c.ProductRepo.GetPaginated(ctx.Context(), int64(parsedPageSize), offset)
 
 	if err != nil {
 		// Mapping required error data
@@ -63,10 +98,10 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 	finish := time.Now()
 
 	// Calculate total pages for paging
-	// math.ceil is always round up, similiar with JS
-	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+	// math.ceil func is always round up, similiar with JS
+	totalPages := int(math.Ceil(float64(totalCount) / float64(parsedPageSize)))
 
-	// Benchmark the query duration
+	// Benchmark the query duration from start time
 	duration := finish.Sub(start).String()
 
 	productListResponse := response.ProductListResponse{
@@ -79,8 +114,8 @@ func (c *ProductControllerImpl) FindAll(ctx *fiber.Ctx) error {
 			List:       dereferencedProducts,
 			TotalItems: totalCount,
 			TotalPages: totalPages,
-			Page:       page,
-			PageSize:   pageSize,
+			Page:       parsedPage,
+			PageSize:   parsedPageSize,
 			Start:      start,
 			Finish:     finish,
 			Duration:   duration,
@@ -94,36 +129,6 @@ func (c *ProductControllerImpl) FindById(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
 	products, err := c.ProductRepo.GetById(ctx.Context(), id)
-
-	if err != nil {
-		productResponseError := response.ProductSingleResponse{
-			CorrelationID: uuid.NewString(),
-			Success:       false,
-			Error:         err.Error(),
-			Tin:           time.Now(),
-			Tout:          time.Now(),
-			Data:          map[string]interface{}{},
-		}
-
-		return ctx.Status(http.StatusInternalServerError).JSON(productResponseError)
-	}
-
-	singleProductResponse := response.ProductSingleResponse{
-		CorrelationID: uuid.NewString(),
-		Success:       true,
-		Error:         "",
-		Tin:           time.Now(),
-		Tout:          time.Now(),
-		Data:          *products,
-	}
-
-	return ctx.Status(http.StatusOK).JSON(singleProductResponse)
-}
-
-func (c *ProductControllerImpl) FindByProductName(ctx *fiber.Ctx) error {
-	productName := ctx.Params("productName")
-
-	products, err := c.ProductRepo.GetByProductName(ctx.Context(), productName)
 
 	if err != nil {
 		productResponseError := response.ProductSingleResponse{
